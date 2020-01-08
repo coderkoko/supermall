@@ -4,6 +4,16 @@
     <nav-bar class="home-nav">
       <div slot='center'>购物街</div>
     </nav-bar>
+
+    <!-- 当到达一定高度时，显示出来 -->
+    <tab-control
+      ref="tabControl1"
+      :title='["流行","新款","精选"]'
+      class="tab-control"
+      v-show="isTabFixed"
+      @tabClick='tabClick'
+    />
+
     <!-- 滚动插件 -->
     <scroll
       class="content"
@@ -14,14 +24,17 @@
       @pullingUp='loadMore'
     >
       <!-- 轮播 -->
-      <home-swiper :banners='banners' />
+      <home-swiper
+        :banners='banners'
+        @swiperImageLoad='swiperImageLoad'
+      />
       <!-- 推荐 -->
       <home-recommend-view :recommends='recommends' />
       <!-- 流行 -->
       <feature-view />
       <!-- 选项卡 -->
       <tab-control
-        class="tab-control"
+        ref="tabControl2"
         :title='["流行","新款","精选"]'
         @tabClick='tabClick'
       />
@@ -52,6 +65,9 @@ import FeatureView from "./childComps/FeatureView";
 //方法数据--------------------------------------------
 import { getHomeMultidata, getHomeGoods } from "network/home";
 
+//工具--------------------------------------------
+import { debounce } from "common/utils";
+
 export default {
   name: "Home",
   components: {
@@ -71,6 +87,9 @@ export default {
       recommends: [],
       currentType: "pop",
       isShowBackTop: false,
+      tabControl: 0,
+      isTabFixed: false,
+      saveY: 0,
       goods: {
         pop: { page: 0, list: [] },
         new: { page: 0, list: [] },
@@ -79,16 +98,51 @@ export default {
       }
     };
   },
-
+  //生命周期函数--------------------------------------------
   //首页创建完之后发送网络请求
   created() {
     //1.请求多个数据
     this.getHomeMultidata();
+
     //2.请求商品数据
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
+
+  //挂载之后回调
+  mounted() {
+    //监听item中图片加载完成
+    //防抖函数
+    const refresh = debounce(this.$refs.scroll.refresh, 0);
+    this.$bus.$on("itemImageLoad", () => {
+      refresh();
+    });
+  },
+
+  //更新之后回调
+  updated() {
+    // console.log(this.$refs.tabControl.$el.offsetTop);
+  },
+
+  //销毁之后回调
+  destroyed() {
+    console.log("----");
+  },
+
+  //活跃状态和离开状态  只有使用keep-alive时出现
+  //活跃状态
+  activated() {
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+    //回来时进行一次刷新，防止BSscroll神经质
+    this.$refs.scroll.refresh();
+  },
+
+  //离开状态
+  deactivated() {
+    this.saveY = this.$refs.scroll.getScrollY();
+  },
+
   /**
    *计算属性
    */
@@ -111,12 +165,15 @@ export default {
     getHomeGoods(type) {
       const page = this.goods[type].page + 1;
       getHomeGoods(type, page).then(res => {
-        this.goods[type].list.push(...res.data.list);
-        this.goods[type].page += 1;
-        this.$refs.scroll.finishPullUp();
+        if (res != undefined) {
+          this.goods[type].list.push(...res.data.list);
+          this.goods[type].page += 1;
+        }
+        //完成上拉加载更多
+        const newFinishPullUp = debounce(this.$refs.scroll.finishPullUp, 1000);
+        newFinishPullUp();
       });
     },
-
     /**
      *事件监听相关方法
      */
@@ -133,6 +190,8 @@ export default {
           this.currentType = "sell";
           break;
       }
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
     //返回顶部事件
     backClick() {
@@ -140,11 +199,21 @@ export default {
     },
     //监听滚动事件
     contentScroll(position) {
+      //1.判断BackTop是否显示
       this.isShowBackTop = -position.y > 1000;
+
+      //2.觉得tabControl是否吸顶
+      this.isTabFixed = -position.y > this.tabControl;
     },
-    //监听加载更多
-    loadMore(scroll) {
+    //加载更多
+    loadMore() {
       this.getHomeGoods(this.currentType);
+    },
+    //监听轮播图图片是否加载完毕
+    swiperImageLoad() {
+      //获取tabControl的offsetTop
+      //所有组件中都有一个属性$el 用于获取组件中的元素
+      this.tabControl = this.$refs.tabControl2.$el.offsetTop;
     }
   }
 };
@@ -154,23 +223,19 @@ export default {
 #home {
   height: 100vh;
   position: relative;
-  padding-top: 44px;
+  /* padding-top: 44px; */
 }
 
 .home-nav {
   background-color: var(--color-tint);
   color: #ffffff;
-  position: fixed;
+
+  /* 在使用浏览器原生的滚动时使用 */
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
-}
-
-.tab-control {
-  position: sticky;
-  top: 44px;
-  z-index: 9;
+  z-index: 9; */
 }
 
 .content {
@@ -180,5 +245,10 @@ export default {
   bottom: 50px;
   left: 0;
   right: 0;
+}
+
+.tab-control {
+  position: relative;
+  z-index: 9;
 }
 </style>

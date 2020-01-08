@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view />
+    <!-- keep-alive 防止路由跳转后销毁该路由 -->
+    <keep-alive>
+      <router-view />
+    </keep-alive>
     <main-tab-bar />
   </div>
 </template>
