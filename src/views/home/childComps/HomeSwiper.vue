@@ -1,5 +1,5 @@
 <template>
-  <swiper>
+  <swiper v-if="banners.length!=0">
     <swiper-item
       v-for="item in banners"
       :key='item.title'
