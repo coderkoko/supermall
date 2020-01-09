@@ -122,7 +122,7 @@ export default {
 
   //更新之后回调
   updated() {
-    // console.log(this.$refs.tabControl.$el.offsetTop);
+    // this.tabControl = this.$refs.tabControl2.$el.offsetTop;
   },
 
   //销毁之后回调

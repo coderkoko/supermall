@@ -1,17 +1,19 @@
 <template>
-  <swiper v-if="banners.length!=0">
-    <swiper-item
-      v-for="item in banners"
-      :key='item.title'
-    >
-      <a :href="item.link">
-        <img
-          :src="item.image"
-          @load="imageLoad"
-        >
-      </a>
-    </swiper-item>
-  </swiper>
+  <div>
+    <swiper v-if="banners.length!=0">
+      <swiper-item
+        v-for="item in banners"
+        :key='item.title'
+      >
+        <a :href="item.link">
+          <img
+            :src="item.image"
+            @load="imageLoad"
+          >
+        </a>
+      </swiper-item>
+    </swiper>
+  </div>
 </template>
 
 <script>
