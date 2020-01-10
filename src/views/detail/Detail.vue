@@ -12,6 +12,8 @@
         :detail-info='detailInfo'
         @imageLoad='imageLoad'
       />
+      <detail-param-info :param-info='paramInfo' />
+      <detail-comment-info :comment-info='commentInfo' />
     </scroll>
   </div>
 </template>
@@ -30,9 +32,13 @@ import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
 //商品详情信息--------------------------------------------
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
+//商品参数信息--------------------------------------------
+import DetailParamInfo from "./childComps/DetailParamInfo";
+//评论信息--------------------------------------------
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
 
 //请求数据
-import { getDetail, Goods, Shop } from "network/detail";
+import { getDetail, Goods, Shop, GoodsParam } from "network/detail";
 
 export default {
   name: "Detail",
@@ -42,7 +48,9 @@ export default {
       topImages: [],
       goods: {},
       shop: {},
-      detailInfo: {}
+      detailInfo: {},
+      paramInfo: {},
+      commentInfo: {}
     };
   },
   created() {
@@ -51,27 +59,41 @@ export default {
     //2.根据iid请求网络数据
 
     getDetail(this.iid).then(res => {
-      console.log(res);
-      const data = res.result;
-      //1.获取顶部轮播数据
-      this.topImages = data.itemInfo.topImages;
-      //2.获取商品信息
-      this.goods = new Goods(
-        data.itemInfo,
-        data.columns,
-        data.shopInfo.services
-      );
+      //理论上来说，进入到这里，res应该是已经存在的
+      //但是未知原因，有时会报错说data未定义（可能网络原因）
+      if (res) {
+        const data = res.result;
+        //1.获取顶部轮播数据
+        this.topImages = data.itemInfo.topImages;
+        //2.获取商品信息
+        this.goods = new Goods(
+          data.itemInfo,
+          data.columns,
+          data.shopInfo.services
+        );
 
-      //3.获取商家信息
-      this.shop = new Shop(data.shopInfo);
+        //3.获取商家信息
+        this.shop = new Shop(data.shopInfo);
 
-      //4.保存商品的详情信息
-      this.detailInfo = data.detailInfo;
+        //4.保存商品的详情信息
+        this.detailInfo = data.detailInfo;
+
+        //5.获取商品参数信息
+        this.paramInfo = new GoodsParam(
+          data.itemParams.info,
+          data.itemParams.rule
+        );
+
+        //6.获取评论信息
+        if (data.rate.cRate !== 0) {
+          this.commentInfo = data.rate.list[0];
+        }
+      }
     });
   },
   methods: {
     imageLoad() {
-      this.$refs.Scroll.refresh();
+      this.$refs.scroll && this.$refs.scroll.refresh();
     }
   },
   components: {
@@ -80,7 +102,9 @@ export default {
     DetailSwiper,
     DetailBaseInfo,
     DetailShopInfo,
-    DetailGoodsInfo
+    DetailGoodsInfo,
+    DetailParamInfo,
+    DetailCommentInfo
   }
 };
 </script>

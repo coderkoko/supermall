@@ -122,7 +122,7 @@ export default {
 
   //更新之后回调
   updated() {
-    // this.tabControl = this.$refs.tabControl2.$el.offsetTop;
+    this.tabControl = this.$refs.tabControl2.$el.offsetTop;
   },
 
   //销毁之后回调
@@ -141,6 +141,10 @@ export default {
   //离开状态
   deactivated() {
     this.saveY = this.$refs.scroll.getScrollY();
+    //事件总线代理  不懂什么原因进入详情页后回到首页无法停留在原来的位置
+    //即进入Detail页面后返回Home无法保留位置
+    this.$bus.$saveY = this.saveY;
+    this.$bus.$scrollTo = this.$refs.scroll.scrollTo;
   },
 
   /**
@@ -158,8 +162,10 @@ export default {
     //1.请求多个数据方法
     async getHomeMultidata() {
       let res = await getHomeMultidata();
-      this.banners = res.data.banner.list;
-      this.recommends = res.data.recommend.list;
+      if (res) {
+        this.banners = res.data.banner.list;
+        this.recommends = res.data.recommend.list;
+      }
     },
     //2.请求商品数据方法
     getHomeGoods(type) {

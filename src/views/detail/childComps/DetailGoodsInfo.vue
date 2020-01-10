@@ -22,6 +22,7 @@
 </template>
 
 <script>
+
 export default {
   name: "DetailGoodsInfo",
   props: {
@@ -41,9 +42,9 @@ export default {
   methods: {
     imgLoad() {
       //判断所有的图片都加载完，就进行一次回调
-      if (++this.counter === this.imagesLength) {
-        this.$emit("imageLoad");
-      }
+      // if (++this.counter === this.imagesLength) {
+      this.$emit("imageLoad");
+      // }
     }
   },
   watch: {

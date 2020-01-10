@@ -47,6 +47,7 @@ export default {
     },
     backHome() {
       this.$router.back();
+      this.$bus.$scrollTo(0, this.$bus.$saveY);
     }
   }
 };
