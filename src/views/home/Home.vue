@@ -90,6 +90,7 @@ export default {
       tabControl: 0,
       isTabFixed: false,
       saveY: 0,
+      itemImageListener: null,
       goods: {
         pop: { page: 0, list: [] },
         new: { page: 0, list: [] },
@@ -115,9 +116,11 @@ export default {
     //监听item中图片加载完成
     //防抖函数
     const refresh = debounce(this.$refs.scroll.refresh, 0);
-    this.$bus.$on("itemImageLoad", () => {
+    //对监听的事件进行保存
+    this.itemImageListener = () => {
       refresh();
-    });
+    };
+    this.$bus.$on("itemImageLoad", this.itemImageListener);
   },
 
   //更新之后回调
@@ -145,6 +148,9 @@ export default {
     //即进入Detail页面后返回Home无法保留位置
     this.$bus.$saveY = this.saveY;
     this.$bus.$scrollTo = this.$refs.scroll.scrollTo;
+
+    //离开的时候取消全局事件的监听
+    this.$bus.$off("itemImageLoad", this.itemImageListener);
   },
 
   /**

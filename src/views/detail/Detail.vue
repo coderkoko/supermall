@@ -14,6 +14,7 @@
       />
       <detail-param-info :param-info='paramInfo' />
       <detail-comment-info :comment-info='commentInfo' />
+      <goods-list :goods='recommends' />
     </scroll>
   </div>
 </template>
@@ -21,6 +22,8 @@
 <script>
 //滚动插件Scroll--------------------------------------------
 import Scroll from "components/common/scroll/Scroll";
+//防抖函数--------------------------------------------
+import { debounce } from "common/utils";
 
 //顶部导航栏--------------------------------------------
 import DetailNavBar from "./childComps/DetailNavBar";
@@ -36,9 +39,17 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 //评论信息--------------------------------------------
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+//展示商品详情页推荐信息
+import GoodsList from "components/content/goods/GoodsList";
 
 //请求数据
-import { getDetail, Goods, Shop, GoodsParam } from "network/detail";
+import {
+  getDetail,
+  Goods,
+  Shop,
+  GoodsParam,
+  getRecommend
+} from "network/detail";
 
 export default {
   name: "Detail",
@@ -50,14 +61,15 @@ export default {
       shop: {},
       detailInfo: {},
       paramInfo: {},
-      commentInfo: {}
+      commentInfo: {},
+      recommends: []
     };
   },
   created() {
     //1.保存iid
     this.iid = this.$route.params.iid;
-    //2.根据iid请求网络数据
 
+    //2.根据iid请求网络数据
     getDetail(this.iid).then(res => {
       //理论上来说，进入到这里，res应该是已经存在的
       //但是未知原因，有时会报错说data未定义（可能网络原因）
@@ -90,12 +102,21 @@ export default {
         }
       }
     });
+
+    //3.获取商品详情页推荐信息
+    getRecommend().then(res => {
+      if (res) {
+        console.log(res);
+        this.recommends = res.data.list;
+      }
+    });
   },
   methods: {
     imageLoad() {
       this.$refs.scroll && this.$refs.scroll.refresh();
     }
   },
+  mounted() {},
   components: {
     Scroll,
     DetailNavBar,
@@ -104,7 +125,8 @@ export default {
     DetailShopInfo,
     DetailGoodsInfo,
     DetailParamInfo,
-    DetailCommentInfo
+    DetailCommentInfo,
+    GoodsList
   }
 };
 </script>
@@ -122,6 +144,6 @@ export default {
   top: 44px;
   left: 0;
   right: 0;
-  bottom: 50px;
+  bottom: 0;
 }
 </style>
