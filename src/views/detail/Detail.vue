@@ -16,6 +16,7 @@
       <detail-comment-info :comment-info='commentInfo' />
       <goods-list :goods='recommends' />
     </scroll>
+    <detail-bottom-bar />
   </div>
 </template>
 
@@ -39,6 +40,8 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 //评论信息--------------------------------------------
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+//底部导航栏---------------------------------------------
+import DetailBottomBar from "./childComps/DetailBottomBar";
 //展示商品详情页推荐信息
 import GoodsList from "components/content/goods/GoodsList";
 
@@ -126,6 +129,7 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     GoodsList
   }
 };
