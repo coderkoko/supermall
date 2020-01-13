@@ -1,4 +1,4 @@
-//防抖函数
+//防抖函数--------------------------------------------
 export function debounce(func, delay = 1000) {
   let timer = null;
   return function (...args) {
@@ -9,7 +9,23 @@ export function debounce(func, delay = 1000) {
   };
 }
 
-//时间格式化函数
+//节流函数--------------------------------------------
+export function throttle(func, delay = 1000) {
+  let previous = Date.now();
+  return function () {
+    let context = this; //this指向window
+    let args = arguments;
+    let now = Date.now();
+    console.log(now - previous);
+    if (now - previous >= delay) {
+      func.apply(context, args);
+      previous = Date.now();
+    }
+  }
+
+}
+
+//时间格式化函数--------------------------------------------
 export function formatDate(date, fmt) {
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));

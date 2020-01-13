@@ -67,6 +67,7 @@ import { getHomeMultidata, getHomeGoods } from "network/home";
 
 //工具--------------------------------------------
 import { debounce } from "common/utils";
+import { itemListenerMixin } from "@/common/mixin";
 
 export default {
   name: "Home",
@@ -80,6 +81,8 @@ export default {
     HomeRecommendView,
     FeatureView
   },
+  //混入--------------------------------------------
+  mixins: [itemListenerMixin],
   //保存获取的数据
   data() {
     return {
@@ -90,7 +93,6 @@ export default {
       tabControl: 0,
       isTabFixed: false,
       saveY: 0,
-      itemImageListener: null,
       goods: {
         pop: { page: 0, list: [] },
         new: { page: 0, list: [] },
@@ -115,12 +117,8 @@ export default {
   mounted() {
     //监听item中图片加载完成
     //防抖函数
-    const refresh = debounce(this.$refs.scroll.refresh, 0);
     //对监听的事件进行保存
-    this.itemImageListener = () => {
-      refresh();
-    };
-    this.$bus.$on("itemImageLoad", this.itemImageListener);
+    //转移到itemListenerMixin混入当中了
   },
 
   //更新之后回调

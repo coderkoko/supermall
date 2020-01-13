@@ -10,13 +10,13 @@
       <detail-shop-info :shop="shop" />
       <detail-goods-info
         :detail-info='detailInfo'
-        @imageLoad='imageLoad'
+        @detailImageLoad='detailImageLoad'
       />
       <detail-param-info :param-info='paramInfo' />
       <detail-comment-info :comment-info='commentInfo' />
       <goods-list :goods='recommends' />
     </scroll>
-    <detail-bottom-bar />
+    <!-- <detail-bottom-bar /> -->
   </div>
 </template>
 
@@ -24,7 +24,9 @@
 //滚动插件Scroll--------------------------------------------
 import Scroll from "components/common/scroll/Scroll";
 //防抖函数--------------------------------------------
-import { debounce } from "common/utils";
+import { debounce, throttle } from "common/utils";
+//混入--------------------------------------------
+import { itemListenerMixin } from "@/common/mixin";
 
 //顶部导航栏--------------------------------------------
 import DetailNavBar from "./childComps/DetailNavBar";
@@ -109,17 +111,23 @@ export default {
     //3.获取商品详情页推荐信息
     getRecommend().then(res => {
       if (res) {
-        console.log(res);
         this.recommends = res.data.list;
       }
     });
   },
   methods: {
-    imageLoad() {
-      this.$refs.scroll && this.$refs.scroll.refresh();
+    detailImageLoad() {
+      let newRefresh =
+        this.$refs.scroll && throttle(this.$refs.scroll.refresh, 1000);
+      newRefresh();
     }
   },
+  mixins: [itemListenerMixin],
   mounted() {},
+  //离开时取消函数--------------------------------------------
+  destroyed() {
+    this.$bus.$off("itemImageLoad", this.itemImageListener);
+  },
   components: {
     Scroll,
     DetailNavBar,
