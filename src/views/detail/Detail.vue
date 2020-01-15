@@ -1,20 +1,14 @@
 <template>
   <div class="detail">
-    <detail-nav-bar />
-    <scroll
-      class="content"
-      ref="scroll"
-    >
+    <detail-nav-bar @titleClick='titleClick' ref="detailNavBar" />
+    <scroll class="content" @scroll='contentScroll' :probe-type='3' ref="scroll">
       <detail-swiper :top-images='topImages' />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
-      <detail-goods-info
-        :detail-info='detailInfo'
-        @detailImageLoad='detailImageLoad'
-      />
-      <detail-param-info :param-info='paramInfo' />
-      <detail-comment-info :comment-info='commentInfo' />
-      <goods-list :goods='recommends' />
+      <detail-goods-info :detail-info='detailInfo' @detailImageLoad='detailImageLoad' />
+      <detail-param-info ref="params" :param-info='paramInfo' />
+      <detail-comment-info ref="comment" :comment-info='commentInfo' />
+      <goods-list ref="recommend" :goods='recommends' />
     </scroll>
     <!-- <detail-bottom-bar /> -->
   </div>
@@ -24,7 +18,7 @@
 //滚动插件Scroll--------------------------------------------
 import Scroll from "components/common/scroll/Scroll";
 //防抖函数--------------------------------------------
-import { debounce, throttle } from "common/utils";
+import { debounce } from "common/utils";
 //混入--------------------------------------------
 import { itemListenerMixin } from "@/common/mixin";
 
@@ -67,7 +61,10 @@ export default {
       detailInfo: {},
       paramInfo: {},
       commentInfo: {},
-      recommends: []
+      recommends: [],
+      themeTopYs: [],
+      currentIndex: 0,
+      getThemTopY: null
     };
   },
   created() {
@@ -105,6 +102,16 @@ export default {
         if (data.rate.cRate !== 0) {
           this.commentInfo = data.rate.list[0];
         }
+
+        //7.下一帧，渲染完后回调$nextTick(()=>{})
+        //nextTick不包含图片，所有能获取到值，但是并不准确
+        // this.$nextTick(() => {
+        //   this.themeTopYs = [];
+        //   this.themeTopYs.push(0);
+        //   this.themeTopYs.push(this.$refs.params.$el.offsetTop - 3);
+        //   this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 3);
+        //   this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 3);
+        // });
       }
     });
 
@@ -114,16 +121,49 @@ export default {
         this.recommends = res.data.list;
       }
     });
-  },
-  methods: {
-    detailImageLoad() {
-      let newRefresh =
-        this.$refs.scroll && throttle(this.$refs.scroll.refresh, 1000);
-      newRefresh();
-    }
+
+    //4.赋值
+    this.getThemTopY = debounce(() => {
+      //每次图片加载完 赋值一次--------------------------------------------
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop - 3);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 3);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 3);
+      this.themeTopYs.push(Number.MAX_VALUE);
+    }, 100);
   },
   mixins: [itemListenerMixin],
+  methods: {
+    detailImageLoad() {
+      this.newRefresh();
+      this.getThemTopY();
+    },
+    titleClick(index) {
+      this.currentIndex = index;
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 1000);
+    },
+    //监听滚动距离--------------------------------------------
+    contentScroll(position) {
+      //1.获取y值
+      const positionY = -position.y;
+
+      //2.和主题进行对比
+      for (let i = 0; i < this.themeTopYs.length - 1; i++) {
+        if (
+          this.currentIndex !== i &&
+          positionY >= this.themeTopYs[i] &&
+          positionY < this.themeTopYs[i + 1]
+        ) {
+          this.currentIndex = i;
+          this.$refs.detailNavBar.currentIndex = this.currentIndex;
+        }
+      }
+    }
+  },
   mounted() {},
+  //数据更新之后--------------------------------------------
+  updated() {},
   //离开时取消函数--------------------------------------------
   destroyed() {
     this.$bus.$off("itemImageLoad", this.itemImageListener);
