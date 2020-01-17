@@ -4,47 +4,24 @@
     <nav-bar class="home-nav">
       <div slot='center'>购物街</div>
     </nav-bar>
-
     <!-- 当到达一定高度时，显示出来 -->
-    <tab-control
-      ref="tabControl1"
-      :title='["流行","新款","精选"]'
-      class="tab-control"
-      v-show="isTabFixed"
-      @tabClick='tabClick'
-    />
-
+    <tab-control ref="tabControl1" :title='["流行","新款","精选"]' class="tab-control" v-show="isTabFixed"
+      @tabClick='tabClick' />
     <!-- 滚动插件 -->
-    <scroll
-      class="content"
-      ref='scroll'
-      :probe-type='3'
-      :pull-up-load='true'
-      @scroll='contentScroll'
-      @pullingUp='loadMore'
-    >
+    <scroll class="content" ref='scroll' :probe-type='3' :pull-up-load='true' @scroll='contentScroll'
+      @pullingUp='loadMore'>
       <!-- 轮播 -->
-      <home-swiper
-        :banners='banners'
-        @swiperImageLoad='swiperImageLoad'
-      />
+      <home-swiper :banners='banners' @swiperImageLoad='swiperImageLoad' />
       <!-- 推荐 -->
       <home-recommend-view :recommends='recommends' />
       <!-- 流行 -->
       <feature-view />
       <!-- 选项卡 -->
-      <tab-control
-        ref="tabControl2"
-        :title='["流行","新款","精选"]'
-        @tabClick='tabClick'
-      />
+      <tab-control ref="tabControl2" :title='["流行","新款","精选"]' @tabClick='tabClick' />
       <goods-list :goods="showGoods" />
     </scroll>
     <!-- 返回顶部事件 组件监听点击时，需要加上native（原生修饰符） -->
-    <back-top
-      @click.native="backClick"
-      v-show="isShowBackTop"
-    />
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
 </template>
 <script>
@@ -68,6 +45,7 @@ import { getHomeMultidata, getHomeGoods } from "network/home";
 //工具--------------------------------------------
 import { debounce } from "common/utils";
 import { itemListenerMixin } from "@/common/mixin";
+import { BACKTOP_DISTANCE } from "@/common/const";
 
 export default {
   name: "Home",
@@ -210,7 +188,7 @@ export default {
     //监听滚动事件
     contentScroll(position) {
       //1.判断BackTop是否显示
-      this.isShowBackTop = -position.y > 1000;
+      this.isShowBackTop = -position.y > BACKTOP_DISTANCE;
 
       //2.觉得tabControl是否吸顶
       this.isTabFixed = -position.y > this.tabControl;

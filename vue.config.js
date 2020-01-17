@@ -8,5 +8,10 @@ module.exports = {
         'network': '@/network'
       }
     }
+  },
+  devServer: {
+    disableHostCheck: true,
+    proxy: 'http://localhost:8080',
+    public: '192.168.9.12:8080'
   }
 };

@@ -10,7 +10,9 @@
       <detail-comment-info ref="comment" :comment-info='commentInfo' />
       <goods-list ref="recommend" :goods='recommends' />
     </scroll>
-    <!-- <detail-bottom-bar /> -->
+    <!-- 返回顶部事件 组件监听点击时，需要加上native（原生修饰符） -->
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
+    <detail-bottom-bar @addCart='addToCart' />
   </div>
 </template>
 
@@ -20,7 +22,7 @@ import Scroll from "components/common/scroll/Scroll";
 //防抖函数--------------------------------------------
 import { debounce } from "common/utils";
 //混入--------------------------------------------
-import { itemListenerMixin } from "@/common/mixin";
+import { itemListenerMixin, backTopMixin } from "@/common/mixin";
 
 //顶部导航栏--------------------------------------------
 import DetailNavBar from "./childComps/DetailNavBar";
@@ -133,7 +135,7 @@ export default {
       this.themeTopYs.push(Number.MAX_VALUE);
     }, 100);
   },
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, backTopMixin],
   methods: {
     detailImageLoad() {
       this.newRefresh();
@@ -159,6 +161,23 @@ export default {
           this.$refs.detailNavBar.currentIndex = this.currentIndex;
         }
       }
+
+      //3.监听是否显示回到顶部，代码在混入中
+      this.listenShowBackTop(position);
+    },
+     //添加到购物车--------------------------------------------
+    addToCart() {
+      console.log(this.goods);
+      //1.获取购物车中需要展示的信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+
+      //2.将商品添加到购物车里
+      console.log(this.$store)
     }
   },
   mounted() {},
@@ -196,6 +215,6 @@ export default {
   top: 44px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 59px;
 }
 </style>
