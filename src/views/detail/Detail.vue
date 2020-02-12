@@ -165,9 +165,9 @@ export default {
       //3.监听是否显示回到顶部，代码在混入中
       this.listenShowBackTop(position);
     },
-     //添加到购物车--------------------------------------------
+    //添加到购物车--------------------------------------------
     addToCart() {
-      console.log(this.goods);
+      // console.log(this.goods);
       //1.获取购物车中需要展示的信息
       const product = {};
       product.image = this.topImages[0];
@@ -175,9 +175,13 @@ export default {
       product.desc = this.goods.desc;
       product.price = this.goods.realPrice;
       product.iid = this.iid;
-
+    
       //2.将商品添加到购物车里
-      console.log(this.$store)
+      //在mutations中的调用commit
+      // this.$store.commit("addCart", product);
+
+      //在actions中的调用dispatch
+      this.$store.dispatch('addCart',product)
     }
   },
   mounted() {},
