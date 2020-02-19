@@ -1,9 +1,6 @@
 <template>
   <!-- ref/children获取子组件 而且，只在本身组件中有用-->
-  <div
-    class="wrapper"
-    ref='wrapper'
-  >
+  <div class="wrapper" ref='wrapper'>
     <div class="content">
       <slot></slot>
     </div>

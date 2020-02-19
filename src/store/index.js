@@ -3,6 +3,7 @@ import Vuex from "vuex";
 
 import mutations from "./mutations";
 import actions from "./actions";
+import getters from "./getters";
 
 //1.安装vuex插件
 Vue.use(Vuex);
@@ -18,7 +19,7 @@ const store = new Vuex.Store({
   //需要修改state中的状态的唯一提交方法------------------------------
   mutations,
   //相当于计算属性--------------------------------------------
-  getters: {},
+  getters,
   //actions异步改变时--------------------------------------------
   //在mutations中存在一些复杂的方法也可以放到actions中
   actions,

@@ -129,9 +129,12 @@ export default {
       //每次图片加载完 赋值一次--------------------------------------------
       this.themeTopYs = [];
       this.themeTopYs.push(0);
-      this.themeTopYs.push(this.$refs.params.$el.offsetTop - 3);
-      this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 3);
-      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 3);
+      this.$refs.params &&
+        this.themeTopYs.push(this.$refs.params.$el.offsetTop - 3);
+      this.$refs.comment &&
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 3);
+      this.$refs.recommend &&
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 3);
       this.themeTopYs.push(Number.MAX_VALUE);
     }, 100);
   },
@@ -175,13 +178,13 @@ export default {
       product.desc = this.goods.desc;
       product.price = this.goods.realPrice;
       product.iid = this.iid;
-    
+
       //2.将商品添加到购物车里
       //在mutations中的调用commit
       // this.$store.commit("addCart", product);
 
       //在actions中的调用dispatch
-      this.$store.dispatch('addCart',product)
+      this.$store.dispatch("addCart", product);
     }
   },
   mounted() {},
