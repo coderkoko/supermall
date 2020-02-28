@@ -1,8 +1,5 @@
 <template>
-  <div
-    class='tab-bar-item'
-    @click='itemClick'
-  >
+  <div class='tab-bar-item' @click='itemClick'>
     <div v-if="!isActive">
       <slot name="item-icon"></slot>
     </div>
@@ -37,7 +34,7 @@ export default {
   },
   computed: {
     isActive() {
-      // console.log(this.$route.path, " 33  ", this.path);
+      // console.log(this.$route.path, this.path);
       return this.$route.path.indexOf(this.path) !== -1;
     },
     activeStyle() {

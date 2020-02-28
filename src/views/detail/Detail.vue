@@ -170,7 +170,7 @@ export default {
     },
     //添加到购物车--------------------------------------------
     addToCart() {
-      // console.log(this.goods);
+      console.log(this.goods);
       //1.获取购物车中需要展示的信息
       const product = {};
       product.image = this.topImages[0];
