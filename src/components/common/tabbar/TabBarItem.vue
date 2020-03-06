@@ -46,7 +46,6 @@ export default {
       //this.$route 处于活跃的路由对象
       //this.$router 全局绑定的路由对象
       //只有当需要更改的路径改变时，才更改
-      // console.log(this.$route.path, " 42  ", this.path);
       if (this.$route.path != this.path) {
         this.$router.replace(this.path);
       }
@@ -55,7 +54,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .tab-bar-item {
   flex: 1;
   text-align: center;

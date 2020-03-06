@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="goods-list-item"
-    @click="itemClick"
-  >
-    <img
-      :src="showImage"
-      @load="imageLoad"
-    >
+  <div class="goods-list-item" @click="itemClick">
+    <img v-lazy='showImage' @load="imageLoad">
     <div class="goods-info">
       <p>{{goodsListItem.title}}</p>
       <span class="price">{{goodsListItem.price}}</span>
@@ -25,6 +19,11 @@ export default {
         return {};
       }
     }
+  },
+  data() {
+    return {
+      router1: ""
+    };
   },
   methods: {
     imageLoad() {

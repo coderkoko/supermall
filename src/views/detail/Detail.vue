@@ -10,15 +10,23 @@
       <detail-comment-info ref="comment" :comment-info='commentInfo' />
       <goods-list ref="recommend" :goods='recommends' />
     </scroll>
+    <detail-bottom-bar @addCart='addToCart' />
     <!-- 返回顶部事件 组件监听点击时，需要加上native（原生修饰符） -->
     <back-top @click.native="backClick" v-show="isShowBackTop" />
-    <detail-bottom-bar @addCart='addToCart' />
+
+    <!-- <toast :message='message' :showToast='showToast' /> -->
   </div>
 </template>
 
 <script>
 //滚动插件Scroll--------------------------------------------
 import Scroll from "components/common/scroll/Scroll";
+// 商品添加提示弹框
+// import Toast from "components/common/toast/Toast";
+
+//展示商品详情页推荐信息
+import GoodsList from "components/content/goods/GoodsList";
+
 //防抖函数--------------------------------------------
 import { debounce } from "common/utils";
 //混入--------------------------------------------
@@ -40,8 +48,9 @@ import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 //底部导航栏---------------------------------------------
 import DetailBottomBar from "./childComps/DetailBottomBar";
-//展示商品详情页推荐信息
-import GoodsList from "components/content/goods/GoodsList";
+
+//映射vuex中的actions的方法
+import { mapActions } from "vuex";
 
 //请求数据
 import {
@@ -67,6 +76,8 @@ export default {
       themeTopYs: [],
       currentIndex: 0,
       getThemTopY: null
+      // message: "",
+      // showToast: false
     };
   },
   created() {
@@ -140,6 +151,9 @@ export default {
   },
   mixins: [itemListenerMixin, backTopMixin],
   methods: {
+    // 解析vuex中actions的函数
+    ...mapActions(["addCart"]),
+
     detailImageLoad() {
       this.newRefresh();
       this.getThemTopY();
@@ -170,7 +184,7 @@ export default {
     },
     //添加到购物车--------------------------------------------
     addToCart() {
-      console.log(this.goods);
+      // console.log(this.goods);
       //1.获取购物车中需要展示的信息
       const product = {};
       product.image = this.topImages[0];
@@ -184,7 +198,22 @@ export default {
       // this.$store.commit("addCart", product);
 
       //在actions中的调用dispatch
-      this.$store.dispatch("addCart", product);
+      //this.$store.dispatch("addCart", product).then(res => console.log(res));
+      // 通过mapActions映射直接使用
+      this.addCart(product).then(res => {
+        // 重新封装toast--------------
+        // this.showToast = true;
+        // this.message = res;
+        // setTimeout(() => {
+        //   this.showToast = false;
+        //   this.message = "";
+        // }, 1500);
+        // 重新封装toast--------------
+
+        // 重新封装插件在toast文件夹的index文件中
+        console.log(this.$toast);
+        this.$toast.showToast(res, 1500);
+      });
     }
   },
   mounted() {},
@@ -205,6 +234,7 @@ export default {
     DetailCommentInfo,
     DetailBottomBar,
     GoodsList
+    // Toast
   }
 };
 </script>
